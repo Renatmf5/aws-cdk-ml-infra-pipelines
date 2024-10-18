@@ -6,5 +6,10 @@
     "us-east-1d",
     "us-east-1e",
     "us-east-1f"
-  ]
+  ],
+  "hosted-zone:account=968128640740:domainName=grupo-ever-rmf.com:region=us-east-1": {
+    "Id": "/hostedzone/Z0092428JHIS5V2VOURF",
+    "Name": "grupo-ever-rmf.com."
+  },
+  "ami:account=968128640740:filters.image-type.0=machine:filters.name.0=amzn2-ami-hvm-*-x86_64-gp2:filters.state.0=available:owners.0=amazon:region=us-east-1": "ami-089f365c7b6a04f00"
 }
