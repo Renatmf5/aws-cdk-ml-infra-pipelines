@@ -24,13 +24,7 @@ export class S3BucketStack extends Stack {
 
     // Adiciona as pastas Bronze e Silver
     bucket.addLifecycleRule({
-      prefix: 'Bronze/',
-      enabled: true,
-      expiration: Duration.days(365), // Expiração em 365 dias
-    });
-
-    bucket.addLifecycleRule({
-      prefix: 'Silver/',
+      prefix: 'Lake/',
       enabled: true,
       expiration: Duration.days(365), // Expiração em 365 dias
     });
@@ -38,7 +32,7 @@ export class S3BucketStack extends Stack {
     // Permissões para upload de arquivos
     const bucketPolicy = new iam.PolicyStatement({
       actions: ['s3:PutObject'],
-      resources: [`${bucket.bucketArn}/Bronze/*`, `${bucket.bucketArn}/Silver/*`],
+      resources: [`${bucket.bucketArn}/Lake/*`],
       principals: [new iam.AccountPrincipal(Aws.ACCOUNT_ID)],
     });
 
