@@ -7,7 +7,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export class ACMResources extends Construct {
-  public certificate: Certificate;
+  public apiCertificate: Certificate;
+  public webAppCertificate: Certificate;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
@@ -16,9 +17,16 @@ export class ACMResources extends Construct {
       domainName: process.env.DOMINIO || 'default_domain',
     });
 
-    this.certificate = new Certificate(this, 'Certificate', {
+    // Certificado para a API (FastAPI)
+    this.apiCertificate = new Certificate(this, 'ApiCertificate', {
       domainName: process.env.SUBDOMINIO || 'default_subdomain',
-      validation: CertificateValidation.fromDns(hostedZone), // Validação por DNS
+      validation: CertificateValidation.fromDns(hostedZone),
+    });
+
+    // Certificado para o WebApp (Next.js)
+    this.webAppCertificate = new Certificate(this, 'WebAppCertificate', {
+      domainName: process.env.WEBAPP_SUBDOMINIO || 'default_webapp_subdomain',
+      validation: CertificateValidation.fromDns(hostedZone),
     });
   }
 }

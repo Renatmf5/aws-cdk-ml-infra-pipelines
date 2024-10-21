@@ -9,7 +9,8 @@ import { ApplicationLoadBalancer } from 'aws-cdk-lib/aws-elasticloadbalancingv2'
 dotenv.config();
 
 interface Route53StackProps extends cdk.StackProps {
-  loadBalancer: ApplicationLoadBalancer;  // Agora recebemos o ALB ao invés da EC2
+  fastApiLoadBalancer: ApplicationLoadBalancer;  // ALB para FastAPI
+  beanstalkLoadBalancer: ApplicationLoadBalancer;  // ALB para Elastic Beanstalk
 }
 
 export class Route53Stack extends cdk.Stack {
@@ -20,11 +21,18 @@ export class Route53Stack extends cdk.Stack {
       domainName: process.env.DOMINIO || "default_domain",
     });
 
-    // Registro A para apontar para o ALB
-    new route53.ARecord(this, "AliasRecord", {
+    // Registro A para apontar para o ALB da FastAPI
+    new route53.ARecord(this, "FastApiAliasRecord", {
       zone: hostedZone,
       recordName: "api",  // Cria o subdomínio api.grupo-ever-rmf.com
-      target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(props.loadBalancer)),  // Aponta para o ALB
+      target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(props.fastApiLoadBalancer)),  // Aponta para o ALB da FastAPI
+    });
+
+    // Registro A para apontar para o ALB do Elastic Beanstalk
+    new route53.ARecord(this, "BeanstalkAliasRecord", {
+      zone: hostedZone,
+      recordName: "app",  // Cria o subdomínio app.grupo-ever-rmf.com
+      target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(props.beanstalkLoadBalancer)),  // Aponta para o ALB do Elastic Beanstalk
     });
   }
 }

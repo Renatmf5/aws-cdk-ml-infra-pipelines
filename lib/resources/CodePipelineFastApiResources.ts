@@ -7,7 +7,7 @@ import { GitHubSourceAction, CodeDeployServerDeployAction } from "aws-cdk-lib/aw
 import * as iam from "aws-cdk-lib/aws-iam";
 
 
-export class CICDStack extends Stack {
+export class CICDFastApiStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -18,8 +18,8 @@ export class CICDStack extends Stack {
     // Definindo a ação de origem do GitHub
     const sourceAction = new GitHubSourceAction({
       actionName: 'GitHub_Source',
-      owner: process.env.YOUR_GITHUB_USERNAME || ' ',
-      repo: process.env.YOUR_REPOSITORY_NAME || ' ',
+      owner: process.env.GITHUB_USERNAME || ' ',
+      repo: process.env.REPOSITORY_FAST_API || ' ',
       branch: 'main', // ou a branch que deseja monitorar
       oauthToken: cdk.SecretValue.secretsManager('github-token', {
         jsonField: 'token', // Campo chave dentro do segredo onde o token está armazenado

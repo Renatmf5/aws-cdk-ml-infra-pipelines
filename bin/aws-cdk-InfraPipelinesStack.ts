@@ -1,76 +1,15 @@
 #!/usr/bin/env node
-/* eslint-disable import/no-extraneous-dependencies */
 import 'source-map-support/register';
-import { App, Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { App } from 'aws-cdk-lib';
 import { config } from 'dotenv';
-import { ServerResources, VPCResources } from '../lib';
-import { envValidator } from '../lib/envValidator';
-import { CICDStack } from '../lib/CodePipelineResources';
-import { ParameterStoreStack } from '../lib/ParameterStoreResources';
-import { S3BucketStack } from '../lib/S3DataLakeResources';
-import { Route53Stack } from '../lib/Route53Resources';
-import { ACMResources } from '../lib/AcmResources';
-import { ALBResources } from '../lib/AlbResources';
+import { FastApiAppStack } from '../lib/stacks/FastApiAppStack';
+import { NextJsAppStack } from '../lib/stacks/NextJsAppStack';
+import { Route53Stack } from '../lib/stacks/Route53Stack';
+import { S3BucketResources } from '../lib/resources/S3BucketResources';
+import { CICDFastApiStack } from '../lib/resources/CodePipelineFastApiResources';
+import { CICDNextJsStack } from '../lib/resources/CodePipelineNextJsResources';
 
 config();
-
-export interface EC2Props extends StackProps {
-  logLevel: string;
-  sshPubKey: string;
-  cpuType: string;
-  instanceSize: string;
-}
-
-export class FastApiApp extends Stack {
-  constructor(scope: Construct, id: string, props: EC2Props) {
-    super(scope, id, props);
-
-    const { logLevel, sshPubKey, cpuType, instanceSize } = props;
-
-    envValidator(props);
-
-    // Create VPC and Security Group
-    const vpcResources = new VPCResources(this, 'VPC');
-    // Create ACM Certificate
-    const acmResources = new ACMResources(this, 'ACM');
-
-    const serverResources = new ServerResources(this, 'EC2', {
-      vpc: vpcResources.vpc,
-      sshSecurityGroup: vpcResources.sshSecurityGroup,
-      logLevel: logLevel,
-      sshPubKey: sshPubKey,
-      cpuType: cpuType,
-      instanceSize: instanceSize.toLowerCase(),
-    });
-
-    const albResources = new ALBResources(this, 'ALBResources', {
-      vpc: vpcResources.vpc,
-      instance: serverResources.instance,
-      certificate: acmResources.certificate,
-    });
-
-    const route53Stack = new Route53Stack(this, 'Route53Stack', {
-      loadBalancer: albResources.alb,
-      env: props.env, // Adiciona o ambiente à stack do Route 53
-    });
-
-
-    // SSM Command to start a session
-    new CfnOutput(this, 'ssmCommand', {
-      value: `aws ssm start-session --target ${serverResources.instance.instanceId}`,
-    });
-
-    // SSH Command to connect to the EC2 Instance
-    new CfnOutput(this, 'sshCommand', {
-      value: `ssh ec2-user@${serverResources.instance.instancePublicDnsName}`,
-    });
-
-    new ParameterStoreStack(this, 'ParameterStack', {
-      env: props.env,
-    });
-  }
-}
 
 const devEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -86,21 +25,50 @@ const stackProps = {
 
 const app = new App();
 
-const s3BucketApp = new S3BucketStack(app, 'S3BucketStack', {
+// S3 Bucket Stack
+const s3BucketApp = new S3BucketResources(app, 'S3BucketStack', {
   env: devEnv,
 });
 
-const ec2App = new FastApiApp(app, 'EC2App', {
+// FastAPI Application Stack (VPC, EC2, ALB)
+const fastapiApp = new FastApiAppStack(app, 'FastApiAppStack', {
   ...stackProps,
   env: devEnv,
 });
 
-const cicdStack = new CICDStack(app, 'CICDStack', {
+// NextJs Application Stack (VPC, EC2, ALB)
+const NextJsApp = new NextJsAppStack(app, 'NextJsAppStack', {
+  ...stackProps,
+  vpc: fastapiApp.vpc,
+  acm: fastapiApp.acm,
   env: devEnv,
 });
 
-ec2App.addDependency(s3BucketApp);
-// Adicione a dependência para garantir a ordem de criação
-cicdStack.addDependency(ec2App);
+// Route53 Stack (Domínio e DNS)
+const route53Stack = new Route53Stack(app, 'Route53Stack', {
+  fastApiLoadBalancer: fastapiApp.albApi.alb,
+  beanstalkLoadBalancer: NextJsApp.albWeb.alb,
+  env: devEnv,
+});
+
+// CI/CD para FastAPI
+const cicdFastApiStack = new CICDFastApiStack(app, 'CICDFastApiStack', {
+  env: devEnv,
+});
+
+// CI/CD para Next.js
+const cicdNextJsStack = new CICDNextJsStack(app, 'CICDNextJsStack', {
+  env: devEnv,
+});
+
+
+// Dependências entre stacks
+//route53Stack.addDependency(ebStack);  // Garantindo que o Route53 dependa do Beanstalk estar pronto
+fastapiApp.addDependency(s3BucketApp);  // Garantindo que o FastAPI dependa do S3 estar pronto
+NextJsApp.addDependency(fastapiApp);  // Garantindo que o Next.js dependa do FastAPI estar pronto
+route53Stack.addDependency(NextJsApp);  // Garantindo que o Route53 dependa do Next.js estar pronto
+cicdFastApiStack.addDependency(fastapiApp);  // Garantindo que o CI/CD dependa do FastAPI estar pronto
+cicdNextJsStack.addDependency(NextJsApp);  // Garantindo que o CI/CD dependa do Next.js estar pronto
+
 
 app.synth();

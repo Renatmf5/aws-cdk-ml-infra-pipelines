@@ -1,4 +1,4 @@
-import { EC2Props } from '../bin/aws-cdk-InfraPipelinesStack'
+import { EC2Props } from '../../lib/stacks/FastApiAppStack';
 
 export enum InstanceSize {
   'MICRO' = 'micro',
