@@ -47,7 +47,7 @@ const NextJsApp = new NextJsAppStack(app, 'NextJsAppStack', {
 // Route53 Stack (Domínio e DNS)
 const route53Stack = new Route53Stack(app, 'Route53Stack', {
   fastApiLoadBalancer: fastapiApp.albApi.alb,
-  beanstalkLoadBalancer: NextJsApp.albWeb.alb,
+  NextJsLoadBalancer: NextJsApp.albWeb.alb,
   env: devEnv,
 });
 
@@ -63,7 +63,7 @@ const cicdNextJsStack = new CICDNextJsStack(app, 'CICDNextJsStack', {
 
 
 // Dependências entre stacks
-//route53Stack.addDependency(ebStack);  // Garantindo que o Route53 dependa do Beanstalk estar pronto
+//route53Stack.addDependency(ebStack);  // Garantindo que o Route53 dependa do NextJs estar pronto
 fastapiApp.addDependency(s3BucketApp);  // Garantindo que o FastAPI dependa do S3 estar pronto
 NextJsApp.addDependency(fastapiApp);  // Garantindo que o Next.js dependa do FastAPI estar pronto
 route53Stack.addDependency(NextJsApp);  // Garantindo que o Route53 dependa do Next.js estar pronto

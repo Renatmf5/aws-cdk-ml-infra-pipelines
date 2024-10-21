@@ -10,7 +10,7 @@ dotenv.config();
 
 interface Route53StackProps extends cdk.StackProps {
   fastApiLoadBalancer: ApplicationLoadBalancer;  // ALB para FastAPI
-  beanstalkLoadBalancer: ApplicationLoadBalancer;  // ALB para Elastic Beanstalk
+  NextJsLoadBalancer: ApplicationLoadBalancer;  // ALB para Elastic NextJs
 }
 
 export class Route53Stack extends cdk.Stack {
@@ -28,11 +28,11 @@ export class Route53Stack extends cdk.Stack {
       target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(props.fastApiLoadBalancer)),  // Aponta para o ALB da FastAPI
     });
 
-    // Registro A para apontar para o ALB do Elastic Beanstalk
-    new route53.ARecord(this, "BeanstalkAliasRecord", {
+    // Registro A para apontar para o ALB do Elastic NextJs
+    new route53.ARecord(this, "NextJsAliasRecord", {
       zone: hostedZone,
       recordName: "app",  // Cria o subdomínio app.grupo-ever-rmf.com
-      target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(props.beanstalkLoadBalancer)),  // Aponta para o ALB do Elastic Beanstalk
+      target: route53.RecordTarget.fromAlias(new route53Targets.LoadBalancerTarget(props.NextJsLoadBalancer)),  // Aponta para o ALB do Elastic NextJs
     });
   }
 }
