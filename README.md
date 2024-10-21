@@ -209,19 +209,19 @@ aws-cdk-ml-infra-pipelines/
 
 ## Diagramas da stack criada (NextJsAppStack) 
 
-<img src="images/NextJsAppStack.png" alt="Diagrama da NextJsAppStack" width="500" style="border: 1px solid black;"/>
+<img src="images/NextJsAppStack.png" alt="Diagrama da NextJsAppStack" width="800" style="border: 1px solid black;"/>
 
 ## Diagramas da stack criada (FastApiAppStack) 
 
-<img src="images/FastApiAppStack.png" alt="Diagrama da FastApiAppStack" width="500" style="border: 1px solid black;"/>
+<img src="images/FastApiAppStack.png" alt="Diagrama da FastApiAppStack" width="800" style="border: 1px solid black;"/>
 
 ## Diagramas da stack criada (CICDNextJsStack) 
 
-<img src="images/CICDNextJsStack.png" alt="Diagrama da CICDNextJsStack" width="500" style="border: 1px solid black;"/>
+<img src="images/CICDNextJsStack.png" alt="Diagrama da CICDNextJsStack" width="700" style="border: 1px solid black;"/>
 
 ## Diagramas da stack criada (CICDFastApiStack) 
 
-<img src="images/CICDFastApiStack.png" alt="Diagrama da CICDFastApiStack" width="500" style="border: 1px solid black;"/>
+<img src="images/CICDFastApiStack.png" alt="Diagrama da CICDFastApiStack" width="700" style="border: 1px solid black;"/>
 
 ## Diagramas da stack criada (Route53Stack) 
 
