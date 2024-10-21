@@ -199,19 +199,30 @@ aws-cdk-ml-infra-pipelines/
 
 ```
 
-## Diagramas das stacks criadas sendo elas(S3BucketStack,ParameterStack,NextJsAppStack,FastApiAppStack, CICDNextJsStack, CICDFastApiStack,Route53Stack) 
+## Diagramas da stack criada (S3BucketStack) 
 
-![Diagrama da S3BucketStack](images/S3BucketStack.png)
+<img src="images/S3BucketStack.png" alt="Diagrama da S3BucketStack" width="500" style="border: 1px solid black;"/>
 
-![Diagrama da ParameterStack](images/ParameterStack.png)
+## Diagramas da stack criada (ParameterStack) 
 
-![Diagrama da NextJsAppStack](images/NextJsAppStack.png)
+<img src="images/ParameterStack.png" alt="Diagrama da ParameterStack" width="500" style="border: 1px solid black;"/>
 
-![Diagrama da FastApiAppStack](images/FastApiAppStack.png)
+## Diagramas da stack criada (NextJsAppStack) 
 
-![Diagrama da CICDNextJsStack](images/CICDNextJsStack.png)
+<img src="images/NextJsAppStack.png" alt="Diagrama da NextJsAppStack" width="500" style="border: 1px solid black;"/>
 
-![Diagrama da CICDFastApiStack](images/CICDFastApiStack.png)
+## Diagramas da stack criada (FastApiAppStack) 
 
-![Diagrama da Route53Stack](images/Route53Stack.png)
+<img src="images/FastApiAppStack.png" alt="Diagrama da FastApiAppStack" width="500" style="border: 1px solid black;"/>
 
+## Diagramas da stack criada (CICDNextJsStack) 
+
+<img src="images/CICDNextJsStack.png" alt="Diagrama da CICDNextJsStack" width="500" style="border: 1px solid black;"/>
+
+## Diagramas da stack criada (CICDFastApiStack) 
+
+<img src="images/CICDFastApiStack.png" alt="Diagrama da CICDFastApiStack" width="500" style="border: 1px solid black;"/>
+
+## Diagramas da stack criada (Route53Stack) 
+
+<img src="images/Route53Stack.png" alt="Diagrama da Route53Stack" width="500" style="border: 1px solid black;"/>
