@@ -40,9 +40,9 @@ A arquitetura proposta é composta pelos seguintes componentes:
 ### S3
 
 - **Descrição**:
-  - **S3BucketResources.ts** Código responsável pela configuração do Bucket S3 representa o Data Lake da aplicação.
+  - **S3BucketResources.ts** Código responsável pela configuração do Bucket S3 que representa o Data Lake da aplicação.
 - **Configuração**:
-  - **Armazenamento de Ativos**: Utilizado para armazenar arquivos tratados lidos pela FastApi do projeto.
+  - **Armazenamento de Ativos**: Utilizado para armazenar arquivos tratados e lidos pela FastApi do projeto.
   - **Regras de Ciclo de Vida**: Adiciona uma regra de ciclo de vida ao bucket para expirar objetos após 365 dias. pois lemos arquivos com dados anuais.
   - **Backups e Logs**: Sem configuração.
   - **Politicas de Acesso**: Define políticas de acesso que permitem colocar objetos no caminho Lake/ , prefixo que representa o Data Lake da aplicação
@@ -141,7 +141,7 @@ A arquitetura proposta é composta pelos seguintes componentes:
     - **JwtSecret**: Cria um parâmetro para o segredo JWT. (Usado na FastApi).
     - **BucketName**: Cria um parâmetro para o nome do bucket S3. Usado nas demais aplicações via SDK.
     - **Env**: Ambiente da aplicação.
-    
+
 ## Pré-requisitos
 
 - **Node.js** versão 14.x ou superior
@@ -196,3 +196,22 @@ aws-cdk-ml-infra-pipelines/
 ├── test/
 │   └── aws-cdk-ml-infra-pipelines.test.ts
 └── tsconfig.json
+
+```
+
+## Diagramas das stacks criadas sendo elas(S3BucketStack,ParameterStack,NextJsAppStack,FastApiAppStack, CICDNextJsStack, CICDFastApiStack,Route53Stack) 
+
+![Diagrama da S3BucketStack](images/S3BucketStack.png)
+
+![Diagrama da ParameterStack](images/ParameterStack.png)
+
+![Diagrama da NextJsAppStack](images/NextJsAppStack.png)
+
+![Diagrama da FastApiAppStack](images/FastApiAppStack.png)
+
+![Diagrama da CICDNextJsStack](images/CICDNextJsStack.png)
+
+![Diagrama da CICDFastApiStack](images/CICDFastApiStack.png)
+
+![Diagrama da Route53Stack](images/Route53Stack.png)
+
