@@ -37,6 +37,7 @@ interface ServerProps {
   sshPubKey: string;
   cpuType: string;
   instanceSize: string;
+  language: 'python' | 'nodejs';
 }
 
 let cpuType: AmazonLinuxCpuType;
@@ -96,20 +97,43 @@ export class ServerResources extends Construct {
     const userData = UserData.forLinux();
 
     // Script de user data que configura a instância EC2 ao inicializar, como instalar pacotes, configurar docker e copiar arquivos do S3.
-    userData.addCommands(
-      'yum update -y',
-      'yum install -y amazon-cloudwatch-agent python3 python3-pip zip unzip',
-      'mkdir -p /home/ec2-user/sample',
-      'aws s3 cp s3://' + assetBucket.bucketName + '/sample /home/ec2-user/sample --recursive',
-      'sudo yum -y install ruby',
-      'sudo yum -y install wget',
-      'cd /home/ec2-user',
-      'wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install',
-      'sudo chmod +x ./install',
-      'sudo ./install auto',
-      'PYTHON_BIN=$(readlink -f $(which python3))',
-      'sudo setcap \'cap_net_bind_service=+ep\' $PYTHON_BIN', // Adiciona permissão para escutar na porta 80
-    );
+    if (props.language === 'python') {
+      userData.addCommands(
+        'yum update -y',
+        'yum install -y amazon-cloudwatch-agent python3 python3-pip zip unzip',
+        'mkdir -p /home/ec2-user/sample',
+        'aws s3 cp s3://' + assetBucket.bucketName + '/sample /home/ec2-user/sample --recursive',
+        'sudo yum -y install ruby',
+        'sudo yum -y install wget',
+        'cd /home/ec2-user',
+        'wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install',
+        'sudo chmod +x ./install',
+        'sudo ./install auto',
+        'PYTHON_BIN=$(readlink -f $(which python3))',
+        'sudo setcap \'cap_net_bind_service=+ep\' $PYTHON_BIN', // Adiciona permissão para escutar na porta 80
+      );
+    } else if (props.language === 'nodejs') {
+      userData.addCommands(
+        'yum update -y',
+        'curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo',
+        'curl -sL https://rpm.nodesource.com/setup_21.x | sudo -E bash - ',
+        'yum install -y nodejs',
+        'yum install -y amazon-cloudwatch-agent nodejs zip unzip yarn',
+        'mkdir -p /home/ec2-user/sample',
+        'aws s3 cp s3://' +
+        assetBucket.bucketName +
+        '/sample /home/ec2-user/sample --recursive',
+        'sudo yum -y install ruby',
+        'sudo yum -y install wget',
+        'cd /home/ec2-user',
+        'wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install',
+        'sudo chmod +x ./install',
+        'sudo ./install auto',
+        'sudo npm install -g pm2',
+        'NODE_BIN=$(readlink -f $(which node))',
+        'sudo setcap \'cap_net_bind_service=+ep\' $NODE_BIN',
+      );
+    }
 
     // Um grupo de segurança é criado para a instância EC2, permitindo o tráfego SSH.
     const ec2InstanceSecurityGroup = new SecurityGroup(this, 'ec2InstanceSecurityGroup', {
@@ -194,6 +218,10 @@ export class ServerResources extends Construct {
     // Add the SSH Security Group to the EC2 instance
     this.instance.addSecurityGroup(props.sshSecurityGroup);
 
-    Tags.of(this.instance).add('Grupo', 'FastAPIServer');
+    if (props.language === 'python') {
+      Tags.of(this.instance).add('Grupo', 'FastAPIServer');
+    } else if (props.language === 'nodejs') {
+      Tags.of(this.instance).add('Grupo', 'NextJsServer');
+    }
   }
 }

@@ -10,13 +10,13 @@ interface ALBProps {
   certificate: Certificate;
 }
 
-export class ALBResources extends Construct {
+export class FastApiALBResources extends Construct {
   public readonly alb: ApplicationLoadBalancer;  // Expondo o ALB publicamente
 
   constructor(scope: Construct, id: string, props: ALBProps) {
     super(scope, id);
 
-    const albSecurityGroup = new SecurityGroup(this, 'ALBSecurityGroup', {
+    const albSecurityGroup = new SecurityGroup(this, 'fastapi-ALBSecurityGroup', {
       vpc: props.vpc,
       allowAllOutbound: true,
     });
@@ -24,13 +24,15 @@ export class ALBResources extends Construct {
     albSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(80), 'Allow HTTP traffic');
     albSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(443), 'Allow HTTPS traffic');
 
-    this.alb = new ApplicationLoadBalancer(this, 'ALB', {
+    this.alb = new ApplicationLoadBalancer(this, 'FastApiALB', {
       vpc: props.vpc,
       internetFacing: true,
       securityGroup: albSecurityGroup,
     });
 
-    const targetGroup = new ApplicationTargetGroup(this, 'TargetGroup', {
+    // EC2 Target Group
+
+    const targetGroup = new ApplicationTargetGroup(this, 'FastApiTargetGroup', {
       vpc: props.vpc,
       protocol: ApplicationProtocol.HTTP,
       port: 80,
@@ -39,7 +41,7 @@ export class ALBResources extends Construct {
 
     targetGroup.addTarget(new InstanceTarget(props.instance));
 
-    const listener = this.alb.addListener('Listener', {
+    const listener = this.alb.addListener('FastApiListener', {
       port: 443,
       certificates: [props.certificate],
       defaultAction: ListenerAction.forward([targetGroup]),

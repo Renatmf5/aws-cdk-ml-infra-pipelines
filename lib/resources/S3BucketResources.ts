@@ -8,7 +8,7 @@ import { config } from 'dotenv';
 config();
 
 
-export class S3BucketStack extends Stack {
+export class S3BucketResources extends Stack {
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
 
